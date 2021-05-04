@@ -1,0 +1,10 @@
+1)利用SCP上傳sh檔至受測Linux主機之/tmp目錄
+2)利用SSH登入受測Linux主機
+3)利用su指令轉換為root身分
+4)執行sh /tmp/audit_centos_7.sh > xxxx.log 2>&1   , 其中xxxx為自取的檔名
+-----↑↑↑↑↑------以上步驟在受測Linux主機執行
+-----↓↓↓↓↓------以下步驟在健診人員電腦執行
+5)利用SCP下載xxxx.log至健診人員電腦
+6)於健診人員電腦內執行TVMS轉換程式： python CentOS_7_TVMS.py -r xxxx.log -o yyyy.csv  , 其中yyyy為輸出TVMS格式的檔名
+7)yyyy.csv即為轉換為TVMS格式的檢測結果
+8)注意：健診人員電腦需安裝Python3與openpyxl套件(pip install openpyxl)
