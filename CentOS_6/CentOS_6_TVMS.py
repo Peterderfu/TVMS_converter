@@ -17,60 +17,60 @@ TVMS_HEADERS = {"A":"弱點發現時間",\
                 "N":"弱點證據描述",\
                 "O":"類型(弱點或合規)"}
 INFO_TABLES=[["項次","評估工具原廠之弱點編號","弱點類別","弱點說明","弱點修補建議"],\
-["1","CentOS 7 伺服器安全基準檢核表步驟-01","CentOS 7 伺服主機帳號及功能設定","Administrator帳號設定","確認僅root帳號之UID為0"],\
-["2","CentOS 7 伺服器安全基準檢核表步驟-02","CentOS 7 伺服主機帳號及功能設定","SSH服務設定","確認UID小於UID_MIN之非root系統帳號的登入shell皆設為「/sbin/nologin」"],\
-["3","CentOS 7 伺服器安全基準檢核表步驟-03","CentOS 7 伺服主機安全性設定","日誌檔輪替服務","編輯/etc/logrotate.d/syslog檔案新增或修改成以下內容：/var/log/messages /var/log/secure /var/log/maillog /var/log/spooler /var/log/boot.log /var/log/cron"],\
-["4","CentOS 7 伺服器安全基準檢核表步驟-04","CentOS 7 伺服主機安全性設定","日誌檔檢視服務","啟用日誌檔檢視(logwatch)服務"],\
-["5","CentOS 7 伺服器安全基準檢核表步驟-05","CentOS 7 伺服主機安全性設定","使用空白密碼之帳號登入方式","禁止使用空白密碼之帳號"],\
-["6","CentOS 7 伺服器安全基準檢核表步驟-06","CentOS 7 伺服主機安全性設定","所有帳號的密碼遮蔽","確認沒有儲存密碼雜湊於/etc/passwd中"],\
-["7","CentOS 7 伺服器安全基準檢核表步驟-07","CentOS 7 伺服主機安全性設定","密碼最短使用期限","PASS_MIN_DAYS設為1"],\
-["8","CentOS 7 伺服器安全基準檢核表步驟-08","CentOS 7 伺服主機安全性設定","密碼到期前提醒使用者變更密碼","PASS_WARN_AGE設為14"],\
-["9","CentOS 7 伺服器安全基準檢核表步驟-09","CentOS 7 伺服主機安全性設定","密碼最長使用期限","PASS_MAX_DAYS設為60"],\
-["10","CentOS 7 伺服器安全基準檢核表步驟-10","CentOS 7 伺服主機安全性設定","密碼最小?度","PASS_MIN_LEN設為12"],\
-["11","CentOS 7 伺服器安全基準檢核表步驟-11","CentOS 7 伺服主機安全性設定","可設定密碼次數","retry設為3"],\
-["12","CentOS 7 伺服器安全基準檢核表步驟-12","CentOS 7 伺服主機安全性設定","密碼必須至少包含數字個數","dcredit設為1"],\
-["13","CentOS 7 伺服器安全基準檢核表步驟-13","CentOS 7 伺服主機安全性設定","密碼必須至少包含大寫字母個數","ucredit設為1"],\
-["14","CentOS 7 伺服器安全基準檢核表步驟-14","CentOS 7 伺服主機安全性設定","密碼必須至少包含小寫字母個數","lcredit設為1"],\
-["15","CentOS 7 伺服器安全基準檢核表步驟-15","CentOS 7 伺服主機安全性設定","密碼必須至少包含特殊字元個數","ocredit設為1"],\
-["16","CentOS 7 伺服器安全基準檢核表步驟-16","CentOS 7 伺服主機安全性設定","新密碼與舊密碼最少相異字元數","difok設為3"],\
-["17","CentOS 7 伺服器安全基準檢核表步驟-17","CentOS 7 伺服主機安全性設定","強制執行密碼歷程記錄","remember設為24"],\
-["18","CentOS 7 伺服器安全基準檢核表步驟-18","CentOS 7 伺服主機安全性設定","密碼雜湊演算法","密碼雜湊演算法設為sha512"],\
-["19","CentOS 7 伺服器安全基準檢核表步驟-19","CentOS 7 伺服主機安全性設定","帳戶鎖定閾值","deny設為5"],\
-["20","CentOS 7 伺服器安全基準檢核表步驟-20","CentOS 7 伺服主機安全性設定","auditd服務","啟用auditd服務(chkconfig auditd on)"],\
-["21","CentOS 7 伺服器安全基準檢核表步驟-21","CentOS 7 伺服主機安全性設定","記錄變更日期與時間事件","記錄變更日期與時間事件( -k time-change)"],\
-["22","CentOS 7 伺服器安全基準檢核表步驟-22","CentOS 7 伺服主機安全性設定","記錄變更使用者或群組資訊事件","記錄變更使用者或群組資訊之事件(-k identity)"],\
-["23","CentOS 7 伺服器安全基準檢核表步驟-23","CentOS 7 伺服主機安全性設定","記錄變更系統網路環境事件","記錄變更系統網路環境之事件(-k system-locale)"],\
-["24","CentOS 7 伺服器安全基準檢核表步驟-24","CentOS 7 伺服主機安全性設定","記錄變更系統強制性存取控制事件","記錄變更系統強制性存取控制事件(-k MAC-policy)"],\
-["25","CentOS 7 伺服器安全基準檢核表步驟-25","CentOS 7 伺服主機安全性設定","記錄變更自主式存取控制權限事件","記錄變更自主式存取控制權限事件(-k perm_mod)"],\
-["26","CentOS 7 伺服器安全基準檢核表步驟-26","CentOS 7 伺服主機安全性設定","記錄不成功的未經授權檔案存取","記錄不成功的未經授權檔案存取(-k access)"],\
-["27","CentOS 7 伺服器安全基準檢核表步驟-27","CentOS 7 伺服主機安全性設定","記錄特權指令使用情形","記錄特權指令使用情形(-k privileged)"],\
-["28","CentOS 7 伺服器安全基準檢核表步驟-28","CentOS 7 伺服主機安全性設定","記錄資料匯出至媒體","記錄資料匯出至媒體(-k export)"],\
-["29","CentOS 7 伺服器安全基準檢核表步驟-29","CentOS 7 伺服主機安全性設定","記錄檔案刪除事件","記錄檔案刪除事件(-k delete)"],\
-["30","CentOS 7 伺服器安全基準檢核表步驟-30","CentOS 7 伺服主機安全性設定","記錄系統管理者活動","記錄系統管理者活動(-k actions)"],\
-["31","CentOS 7 伺服器安全基準檢核表步驟-31","CentOS 7 伺服主機安全性設定","記錄核心模組掛載與卸載事件","記錄核心模組掛載與卸載事件(-k modules)"],\
-["32","CentOS 7 伺服器安全基準檢核表步驟-32","CentOS 7 伺服主機安全性設定","auditd設定不變模式","/etc/audit/audit.rules最後一行設為「-e 2」"],\
-["33","CentOS 7 伺服器安全基準檢核表步驟-33","CentOS 7 伺服主機安全性設定","記錄變更登入與登出資訊事件","記錄變更登入與登出資訊事件(-k logins)"],\
-["34","CentOS 7 伺服器安全基準檢核表步驟-34","CentOS 7 伺服主機安全性設定","記錄程序與會談啟始資訊","記錄程序與會談啟始資訊(-k session)"],\
-["35","CentOS 7 伺服器安全基準檢核表步驟-35","CentOS 7 伺服主機安全性設定","螢幕保護裝置設定(GNOME螢幕保護裝置逾時)","idle_delay設為15"],\
-["36","CentOS 7 伺服器安全基準檢核表步驟-36","CentOS 7 防火牆設定程序","iptables服務","啟用iptables服務(chkconfig iptables on)"],\
-["37","CentOS 7 伺服器安全基準檢核表步驟-37","CentOS 7 防火牆設定程序","INPUT與FORWARD防火牆規則鏈的預設規則","將INPUT與FORWARD防火牆規則鏈預設規則變更為DROP"],\
-["38","CentOS 7 伺服器安全基準檢核表步驟-38","CentOS 7 防火牆設定程序","IP轉送","於/etc/sysctl.conf中設定net.ipv4.ip_forward = 0"],\
-["39","CentOS 7 伺服器安全基準檢核表步驟-39","CentOS 7 防火牆設定程序","所有網路介面傳送ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.send_redirects=0"],\
-["40","CentOS 7 伺服器安全基準檢核表步驟-40","CentOS 7 防火牆設定程序","預設網路介面傳送ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.default.send_redirects = 0"],\
-["41","CentOS 7 伺服器安全基準檢核表步驟-41","CentOS 7 防火牆設定程序","所有網路介面接受安全的ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.secure_redirects = 0"],\
-["42","CentOS 7 伺服器安全基準檢核表步驟-42","CentOS 7 防火牆設定程序","預設網路介面接受安全的ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.default.secure_redirects = 0"],\
-["43","CentOS 7 伺服器安全基準檢核表步驟-43","CentOS 7 防火牆設定程序","所有網路介面接受ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.accept_redirects = 0"],\
-["44","CentOS 7 伺服器安全基準檢核表步驟-44","CentOS 7 防火牆設定程序","預設網路介面接受ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.default.accept_redirects = 0"],\
-["45","CentOS 7 伺服器安全基準檢核表步驟-45","CentOS 7 防火牆設定程序","所有網路介面接受來源路由封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.accept_source_route = 0"],\
-["46","CentOS 7 伺服器安全基準檢核表步驟-46","CentOS 7 防火牆設定程序","預設網路介面接受來源路由封包","於/etc/sysctl.conf中設定net.ipv4.conf.default.accept_source_route = 0"],\
-["47","CentOS 7 伺服器安全基準檢核表步驟-47","CentOS 7 防火牆設定程序","忽略偽造的ICMP錯誤訊息","於/etc/sysctl.conf中設定net.ipv4.icmp_ignore_bogus_error_responses = 1"],\
-["48","CentOS 7 伺服器安全基準檢核表步驟-48","CentOS 7 防火牆設定程序","不回應ICMP廣播要求","於/etc/sysctl.conf中設定net.ipv4.icmp_echo_ignore_broadcasts = 1"],\
-["49","CentOS 7 伺服器安全基準檢核表步驟-49","CentOS 7 防火牆設定程序","紀錄可疑封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.log_martians = 1"],\
-["50","CentOS 7 伺服器安全基準檢核表步驟-50","CentOS 7 防火牆設定程序","所有網路介面啟用逆向路徑過濾功能","於/etc/sysctl.conf中設定net.ipv4.conf.all.rp_filter = 1"],\
-["51","CentOS 7 伺服器安全基準檢核表步驟-51","CentOS 7 防火牆設定程序","預設網路介面啟用逆向路徑過濾功能","於/etc/sysctl.conf中設定net.ipv4.conf.default.rp_filter = 1"],\
-["52","CentOS 7 伺服器安全基準檢核表步驟-52","CentOS 7 防火牆設定程序","TCP SYN cookies","於/etc/sysctl.conf中設定net.ipv4.tcp_syncookies = 1"],\
-["53","CentOS 7 伺服器安全基準檢核表步驟-53","CentOS 7 防火牆設定程序","無線網路介面卡","停用無線網路介面卡"],\
-["54","CentOS 7 伺服器安全基準檢核表步驟-54","CentOS 7 時戳及校時(NTP)","設定NTP server","於/etc/ntp.conf中設定NTP server IP"]]
+["1","CentOS 6 伺服器安全基準檢核表步驟-01","CentOS 6 伺服主機帳號及功能設定","Administrator帳號設定","確認僅root帳號之UID為0"],\
+["2","CentOS 6 伺服器安全基準檢核表步驟-02","CentOS 6 伺服主機帳號及功能設定","SSH服務設定","確認UID小於UID_MIN之非root系統帳號的登入shell皆設為「/sbin/nologin」"],\
+["3","CentOS 6 伺服器安全基準檢核表步驟-03","CentOS 6 伺服主機安全性設定","日誌檔輪替服務","編輯/etc/logrotate.d/syslog檔案新增或修改成以下內容：/var/log/messages /var/log/secure /var/log/maillog /var/log/spooler /var/log/boot.log /var/log/cron"],\
+["4","CentOS 6 伺服器安全基準檢核表步驟-04","CentOS 6 伺服主機安全性設定","日誌檔檢視服務","啟用日誌檔檢視(logwatch)服務"],\
+["5","CentOS 6 伺服器安全基準檢核表步驟-05","CentOS 6 伺服主機安全性設定","使用空白密碼之帳號登入方式","禁止使用空白密碼之帳號"],\
+["6","CentOS 6 伺服器安全基準檢核表步驟-06","CentOS 6 伺服主機安全性設定","所有帳號的密碼遮蔽","確認沒有儲存密碼雜湊於/etc/passwd中"],\
+["7","CentOS 6 伺服器安全基準檢核表步驟-07","CentOS 6 伺服主機安全性設定","密碼最短使用期限","PASS_MIN_DAYS設為1"],\
+["8","CentOS 6 伺服器安全基準檢核表步驟-08","CentOS 6 伺服主機安全性設定","密碼到期前提醒使用者變更密碼","PASS_WARN_AGE設為14"],\
+["9","CentOS 6 伺服器安全基準檢核表步驟-09","CentOS 6 伺服主機安全性設定","密碼最長使用期限","PASS_MAX_DAYS設為60"],\
+["10","CentOS 6 伺服器安全基準檢核表步驟-10","CentOS 6 伺服主機安全性設定","密碼最小?度","PASS_MIN_LEN設為12"],\
+["11","CentOS 6 伺服器安全基準檢核表步驟-11","CentOS 6 伺服主機安全性設定","可設定密碼次數","retry設為3"],\
+["12","CentOS 6 伺服器安全基準檢核表步驟-12","CentOS 6 伺服主機安全性設定","密碼必須至少包含數字個數","dcredit設為1"],\
+["13","CentOS 6 伺服器安全基準檢核表步驟-13","CentOS 6 伺服主機安全性設定","密碼必須至少包含大寫字母個數","ucredit設為1"],\
+["14","CentOS 6 伺服器安全基準檢核表步驟-14","CentOS 6 伺服主機安全性設定","密碼必須至少包含小寫字母個數","lcredit設為1"],\
+["15","CentOS 6 伺服器安全基準檢核表步驟-15","CentOS 6 伺服主機安全性設定","密碼必須至少包含特殊字元個數","ocredit設為1"],\
+["16","CentOS 6 伺服器安全基準檢核表步驟-16","CentOS 6 伺服主機安全性設定","新密碼與舊密碼最少相異字元數","difok設為3"],\
+["17","CentOS 6 伺服器安全基準檢核表步驟-17","CentOS 6 伺服主機安全性設定","強制執行密碼歷程記錄","remember設為24"],\
+["18","CentOS 6 伺服器安全基準檢核表步驟-18","CentOS 6 伺服主機安全性設定","密碼雜湊演算法","密碼雜湊演算法設為sha512"],\
+["19","CentOS 6 伺服器安全基準檢核表步驟-19","CentOS 6 伺服主機安全性設定","帳戶鎖定閾值","deny設為5"],\
+["20","CentOS 6 伺服器安全基準檢核表步驟-20","CentOS 6 伺服主機安全性設定","auditd服務","啟用auditd服務(chkconfig auditd on)"],\
+["21","CentOS 6 伺服器安全基準檢核表步驟-21","CentOS 6 伺服主機安全性設定","記錄變更日期與時間事件","記錄變更日期與時間事件( -k time-change)"],\
+["22","CentOS 6 伺服器安全基準檢核表步驟-22","CentOS 6 伺服主機安全性設定","記錄變更使用者或群組資訊事件","記錄變更使用者或群組資訊之事件(-k identity)"],\
+["23","CentOS 6 伺服器安全基準檢核表步驟-23","CentOS 6 伺服主機安全性設定","記錄變更系統網路環境事件","記錄變更系統網路環境之事件(-k system-locale)"],\
+["24","CentOS 6 伺服器安全基準檢核表步驟-24","CentOS 6 伺服主機安全性設定","記錄變更系統強制性存取控制事件","記錄變更系統強制性存取控制事件(-k MAC-policy)"],\
+["25","CentOS 6 伺服器安全基準檢核表步驟-25","CentOS 6 伺服主機安全性設定","記錄變更自主式存取控制權限事件","記錄變更自主式存取控制權限事件(-k perm_mod)"],\
+["26","CentOS 6 伺服器安全基準檢核表步驟-26","CentOS 6 伺服主機安全性設定","記錄不成功的未經授權檔案存取","記錄不成功的未經授權檔案存取(-k access)"],\
+["27","CentOS 6 伺服器安全基準檢核表步驟-27","CentOS 6 伺服主機安全性設定","記錄特權指令使用情形","記錄特權指令使用情形(-k privileged)"],\
+["28","CentOS 6 伺服器安全基準檢核表步驟-28","CentOS 6 伺服主機安全性設定","記錄資料匯出至媒體","記錄資料匯出至媒體(-k export)"],\
+["29","CentOS 6 伺服器安全基準檢核表步驟-29","CentOS 6 伺服主機安全性設定","記錄檔案刪除事件","記錄檔案刪除事件(-k delete)"],\
+["30","CentOS 6 伺服器安全基準檢核表步驟-30","CentOS 6 伺服主機安全性設定","記錄系統管理者活動","記錄系統管理者活動(-k actions)"],\
+["31","CentOS 6 伺服器安全基準檢核表步驟-31","CentOS 6 伺服主機安全性設定","記錄核心模組掛載與卸載事件","記錄核心模組掛載與卸載事件(-k modules)"],\
+["32","CentOS 6 伺服器安全基準檢核表步驟-32","CentOS 6 伺服主機安全性設定","auditd設定不變模式","/etc/audit/audit.rules最後一行設為「-e 2」"],\
+["33","CentOS 6 伺服器安全基準檢核表步驟-33","CentOS 6 伺服主機安全性設定","記錄變更登入與登出資訊事件","記錄變更登入與登出資訊事件(-k logins)"],\
+["34","CentOS 6 伺服器安全基準檢核表步驟-34","CentOS 6 伺服主機安全性設定","記錄程序與會談啟始資訊","記錄程序與會談啟始資訊(-k session)"],\
+["35","CentOS 6 伺服器安全基準檢核表步驟-35","CentOS 6 伺服主機安全性設定","螢幕保護裝置設定(GNOME螢幕保護裝置逾時)","idle_delay設為15"],\
+["36","CentOS 6 伺服器安全基準檢核表步驟-36","CentOS 6 防火牆設定程序","iptables服務","啟用iptables服務(chkconfig iptables on)"],\
+["37","CentOS 6 伺服器安全基準檢核表步驟-37","CentOS 6 防火牆設定程序","INPUT與FORWARD防火牆規則鏈的預設規則","將INPUT與FORWARD防火牆規則鏈預設規則變更為DROP"],\
+["38","CentOS 6 伺服器安全基準檢核表步驟-38","CentOS 6 防火牆設定程序","IP轉送","於/etc/sysctl.conf中設定net.ipv4.ip_forward = 0"],\
+["39","CentOS 6 伺服器安全基準檢核表步驟-39","CentOS 6 防火牆設定程序","所有網路介面傳送ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.send_redirects=0"],\
+["40","CentOS 6 伺服器安全基準檢核表步驟-40","CentOS 6 防火牆設定程序","預設網路介面傳送ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.default.send_redirects = 0"],\
+["41","CentOS 6 伺服器安全基準檢核表步驟-41","CentOS 6 防火牆設定程序","所有網路介面接受安全的ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.secure_redirects = 0"],\
+["42","CentOS 6 伺服器安全基準檢核表步驟-42","CentOS 6 防火牆設定程序","預設網路介面接受安全的ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.default.secure_redirects = 0"],\
+["43","CentOS 6 伺服器安全基準檢核表步驟-43","CentOS 6 防火牆設定程序","所有網路介面接受ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.accept_redirects = 0"],\
+["44","CentOS 6 伺服器安全基準檢核表步驟-44","CentOS 6 防火牆設定程序","預設網路介面接受ICMP重新導向封包","於/etc/sysctl.conf中設定net.ipv4.conf.default.accept_redirects = 0"],\
+["45","CentOS 6 伺服器安全基準檢核表步驟-45","CentOS 6 防火牆設定程序","所有網路介面接受來源路由封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.accept_source_route = 0"],\
+["46","CentOS 6 伺服器安全基準檢核表步驟-46","CentOS 6 防火牆設定程序","預設網路介面接受來源路由封包","於/etc/sysctl.conf中設定net.ipv4.conf.default.accept_source_route = 0"],\
+["47","CentOS 6 伺服器安全基準檢核表步驟-47","CentOS 6 防火牆設定程序","忽略偽造的ICMP錯誤訊息","於/etc/sysctl.conf中設定net.ipv4.icmp_ignore_bogus_error_responses = 1"],\
+["48","CentOS 6 伺服器安全基準檢核表步驟-48","CentOS 6 防火牆設定程序","不回應ICMP廣播要求","於/etc/sysctl.conf中設定net.ipv4.icmp_echo_ignore_broadcasts = 1"],\
+["49","CentOS 6 伺服器安全基準檢核表步驟-49","CentOS 6 防火牆設定程序","紀錄可疑封包","於/etc/sysctl.conf中設定net.ipv4.conf.all.log_martians = 1"],\
+["50","CentOS 6 伺服器安全基準檢核表步驟-50","CentOS 6 防火牆設定程序","所有網路介面啟用逆向路徑過濾功能","於/etc/sysctl.conf中設定net.ipv4.conf.all.rp_filter = 1"],\
+["51","CentOS 6 伺服器安全基準檢核表步驟-51","CentOS 6 防火牆設定程序","預設網路介面啟用逆向路徑過濾功能","於/etc/sysctl.conf中設定net.ipv4.conf.default.rp_filter = 1"],\
+["52","CentOS 6 伺服器安全基準檢核表步驟-52","CentOS 6 防火牆設定程序","TCP SYN cookies","於/etc/sysctl.conf中設定net.ipv4.tcp_syncookies = 1"],\
+["53","CentOS 6 伺服器安全基準檢核表步驟-53","CentOS 6 防火牆設定程序","無線網路介面卡","停用無線網路介面卡"],\
+["54","CentOS 6 伺服器安全基準檢核表步驟-54","CentOS 6 時戳及校時(NTP)","設定NTP server","於/etc/ntp.conf中設定NTP server IP"]]
 PASS_MIN_DAYS                               ='1'
 PASS_WARN_AGE                               ='14'
 PASS_MAX_DAYS                               ='60'
@@ -216,7 +216,7 @@ def getAudit18(match):
 def getAudit19(match):
     return evalFunc0('(?<=deny=)\b?\d+(?=[\s\n]?)',match.group(0).strip('\n'),DENY)
 def getAudit20(match):
-    patterns = ["enabled"]
+    patterns = ["2:on.+3:on.+4:on.+5:on"]
     return evalFunc1(patterns, match.group(0).strip('\n'))
 def getAudit21(match):
     patterns = ["-a always,exit -F arch=b(32|64) -S adjtimex -S settimeofday -S stime -k time-change", \
@@ -282,12 +282,12 @@ def getAudit35(match):
     patterns = ["15"]
     return evalFunc1(patterns, match.group(0).strip('\n'))
 def getAudit36(match):
-    patterns = ["enabled"]
+    patterns = ["^iptables"]
     return evalFunc1(patterns, match.group(0).strip('\n'))
 def getAudit37(match):
-    patterns = ["\*filter", \
-                ":INPUT DROP \[0:0\]", \
-                ":FORWARD DROP \[0:0\]"]
+    patterns = ["^Chain INPUT.+DROP", \
+                "^Chain FORWARD.+DROP", \
+                "^Chain OUTPUT.+DROP"]
     return evalFunc1(patterns, match.group(0).strip('\n'))
 
 def getAudit38(match):
