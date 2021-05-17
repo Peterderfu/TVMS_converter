@@ -24,6 +24,7 @@ VUL_NAME = {"D":"作業系統安全性更新編號",\
             "I":"防毒軟體",\
             "J":"惡意程式檢測結果"}
 UNUPDATED = "未更新"
+UPDATED = "已更新至最新"
 KBNOTFOUND = "kbid is not found"
 MALWARENOTFOUND = "未發現惡意程式"
 FAILED = "不符合"
@@ -45,7 +46,7 @@ def main():
     if len(input_file.worksheets)==0:
         sys.exit(f"檔案 {INPUT_FILE} 內沒有工作表")
     try:
-        output_file = open(OUTPUT_FILE,encoding='utf-8',mode='w')
+        output_file = open(OUTPUT_FILE,encoding='utf-8-sig',mode='w')
     except :
         print(f'Unable to open {OUTPUT_FILE}--', sys.exc_info()[0])
         raise
@@ -158,12 +159,12 @@ def main():
         if cell.row == 1:
             continue # skip the first row
         else:
-            if UNUPDATED in cell.value:
+            if not (UPDATED in cell.value):
                 result_list = dict(zip(TVMS_HEADERS.keys(),['']*len(TVMS_HEADERS.keys())))
                 IP = ws[f'C{cell.row}'].value.strip(";").split(";")
                 result_list['F'] = VUL_NAME['I']
                 result_list['G'] = FAILED
-                result_list['K'] = UNUPDATED
+                result_list['K'] = cell.value
                 result_list['J'] = TOOL_NAME
                 result_list['O'] = CHECK_TYPE
                 for ip in IP:

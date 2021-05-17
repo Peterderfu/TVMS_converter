@@ -47,7 +47,7 @@ def main():
     ws = input_file[SHEET]  # open desired worksheet in Excel
         
     try: # open the output file for writing
-        output_file = open(OUTPUT_FILE,encoding='utf-8',mode='w')
+        output_file = open(OUTPUT_FILE,encoding='utf-8-sig',mode='w')
     except :
         print(f'Unable to open {OUTPUT_FILE}--', sys.exc_info()[0])
         raise

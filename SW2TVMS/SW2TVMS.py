@@ -91,7 +91,7 @@ def main():
                 print(f'Unable to open {filename}--', sys.exc_info()[0])
             tmpdict = {}
             for r in range(1,len(lines)):
-                [IPs,version,latest,status] = [lines[r].split(',')[i] for i in [2,3,4,5]]
+                [IPs,latest,version,status] = [lines[r].split(',')[i] for i in [2,3,4,5]]
                 IPs = IPs.strip(";").split(";")
                 for ip in IPs:
                     tmpdict[ip.strip()] = {MERGED_HEADER['E']:version,MERGED_HEADER['F']:latest,MERGED_HEADER['G']:status}
@@ -105,7 +105,7 @@ def main():
                 print(f'Unable to open {filename}--', sys.exc_info()[0])
             tmpdict = {}
             for r in range(1,len(lines)):
-                [IPs,version,latest,status] = [lines[r].split(',')[i] for i in [2,3,4,5]]
+                [IPs,latest,version,status] = [lines[r].split(',')[i] for i in [2,3,4,5]]
                 IPs = IPs.strip(";").split(";")
                 for ip in IPs:
                     tmpdict[ip.strip()] = {MERGED_HEADER['H']:version,MERGED_HEADER['I']:latest,MERGED_HEADER['J']:status}
@@ -119,7 +119,7 @@ def main():
                 print(f'Unable to open {filename}--', sys.exc_info()[0])
             tmpdict = {}
             for r in range(1,len(lines)):
-                [IPs,version,latest,status] = [lines[r].split(',')[i] for i in [2,3,4,5]]
+                [IPs,latest,version,status] = [lines[r].split(',')[i] for i in [2,3,4,5]]
                 IPs = IPs.strip(";").split(";")
                 for ip in IPs:
                     tmpdict[ip.strip()] = {MERGED_HEADER['K']:version,MERGED_HEADER['L']:latest,MERGED_HEADER['M']:status}
@@ -129,7 +129,7 @@ def main():
 #----------------------------------------------------------------------------------------------------------    
     GCBSW = {}
     for filename in os.listdir(source_paths["GCBSW"]):
-        m = re.search('(?<=_)\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}(?=_)',filename)
+        m = re.search('(?<=_)\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}.*(?=_)',filename)
         if m: # filename pattern "_[IPv4]_" found 
             ip = m.group(0)
             try:
@@ -138,11 +138,13 @@ def main():
                 office = []
                 Antivirus = ""
                 for row in ws.iter_rows(min_row=2):
-                    if row[1].value and ("OfficeScan" in row[1].value or "Apex One Security Agent" in row[1].value):
+                    if row[1].value and ("OfficeScan".upper() in row[1].value.upper() or "Apex One Security Agent".upper() in row[1].value.upper()):
                         Antivirus = row[1].value + "_" + row[2].value
                     elif row[0].value and row[1].value and ("Microsoft" in row[0].value) and ("Office" in row[1].value):
                         office.append(row[1].value + "_" + row[2].value)
-                    GCBSW[ip] =  {MERGED_HEADER['D']:";".join(office),MERGED_HEADER['N']:Antivirus}
+                    IPs = ip.split(",")
+                    for p in IPs:
+                        GCBSW[p] =  {MERGED_HEADER['D']:";".join(office),MERGED_HEADER['N']:Antivirus}
                 gcbsw_file.close()
             except:
                 print(f'Unable to open {filename}--', sys.exc_info()[0])
@@ -196,44 +198,51 @@ def main():
             line.insert(1, ip)
             f.write(",".join(line) + '\n')
     
-#     tvms_all_file = os.path.join(os.path.dirname(OUTPUT_FILE),"tvms_all_"+os.path.basename(OUTPUT_FILE))
     tvms_failed_file = OUTPUT_FILE
-#     with open(tvms_all_file,'w') as f_all:
-    with open(tvms_failed_file,'w') as f_failed:
+    with open(tvms_failed_file,encoding='utf-8-sig',mode='w') as f_failed:
         headers = list(TVMS_HEADERS.values())
-#         f_all.write(",".join(headers) + '\n')
         f_failed.write(",".join(headers) + '\n')
         for ip,v in merged_data.items():
             result_list = dict(zip(TVMS_HEADERS.keys(),['']*len(TVMS_HEADERS.keys())))
+            
+            result_list['B'] = ip
+            result_list['J'] = "軟體版本檢測" 
+            result_list['O'] = CHECK_TYPE
             
             if is_office_phaseout(v['Office']):
                 result_list['F'] = 'Office軟體版本過舊'
                 result_list['K'] = v['Office']
                 result_list['G'] = FAILED
+                result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
+                f_failed.write(",".join(list(result_list.values()))+"\n")
             if is_windows_phaseout(v['OS version']):
                 result_list['F'] = 'Windows作業系統版本過舊'
                 result_list['K'] = v['OS version'] 
                 result_list['G'] = FAILED
+                result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
+                f_failed.write(",".join(list(result_list.values()))+"\n")
             if is_antivirus_phaseout(v['Antivirus']):
                 result_list['F'] = '防毒軟體未更新'
                 result_list['K'] = v['Antivirus'] 
                 result_list['G'] = FAILED
+                result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
+                f_failed.write(",".join(list(result_list.values()))+"\n")
             if UNUPDATED in v['Adobe Reader status']:
                 result_list['F'] = 'Adobe Reader未更新'
-                result_list['K'] = v['Adobe Reader status']
+                result_list['K'] = 'Adobe Reader ' + v['Adobe Reader']
                 result_list['G'] = FAILED
+                result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
+                f_failed.write(",".join(list(result_list.values()))+"\n")
             if UNUPDATED in v['Flash Player status']:
                 result_list['F'] = 'Flash Player未更新'
-                result_list['K'] = v['Flash Player status']
+                result_list['K'] = 'Flash Player ' + v['Flash Player']
                 result_list['G'] = FAILED
+                result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
+                f_failed.write(",".join(list(result_list.values()))+"\n")
             if UNUPDATED in v['Java status']:
                 result_list['F'] = 'Java未更新'
-                result_list['K'] = v['Java status']
+                result_list['K'] = 'Java ' + v['Java']
                 result_list['G'] = FAILED
-            if result_list['G'] == FAILED:
-                result_list['B'] = ip
-                result_list['J'] = "軟體版本檢測" 
-                result_list['O'] = CHECK_TYPE
                 result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                 f_failed.write(",".join(list(result_list.values()))+"\n")
     
