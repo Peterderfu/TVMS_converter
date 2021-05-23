@@ -222,7 +222,7 @@ def getAudit20(match):
     return evalFunc1(patterns, match.group(0).strip('\n'))
 def getAudit21(match):
     patterns = ["-a always,exit -F arch=b(32|64) -S adjtimex -S settimeofday -S stime -k time-change", \
-                "-a always,exit -F arch=b(32|64) -S clock_settime -k timechange", \
+                "-a always,exit -F arch=b(32|64) -S clock_settime -k time-change", \
                 "-w /etc/localtime -p wa -k time-change"]
     return evalFunc1(patterns, match.group(0).strip('\n'))
 def getAudit22(match):
@@ -264,7 +264,8 @@ def getAudit30(match):
     patterns = ["-w /etc/sudoers -p wa -k actions"]
     return evalFunc1(patterns, match.group(0).strip('\n'))
 def getAudit31(match):
-    patterns = ["-w /sbin/insmod -p x -k modules -w /sbin/rmmod -p x -k modules", \
+    patterns = ["-w /sbin/insmod -p x -k modules", \ 
+                "-w /sbin/rmmod -p x -k modules", \
                 "-w /sbin/modprobe -p x -k modules", \
                 "-a always,exit -F arch=b(32|64) -S init_module -S delete_module -k modules"]
     return evalFunc1(patterns, match.group(0).strip('\n'))
