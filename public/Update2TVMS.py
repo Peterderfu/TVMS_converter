@@ -671,6 +671,7 @@ def main():
     parser.add_argument("-o", "--output", help = "輸出TVMS檔案路徑")
     parser.add_argument("-n", "--number",help = "評估工具原廠之弱點編號",default="")
     parser.add_argument("-a", "--version",help = "防毒軟體基準版本",default='14.0.9204')
+    parser.add_argument("-m", "--merge",help = "產生彙整檔案",action="store_true",default=False)
     
     args = parser.parse_args()
     INPUT_DIR = os.path.abspath(args.read)
@@ -678,8 +679,31 @@ def main():
     OUTPUT_FILE     = os.path.join(OUTPUT_DIR,"TVMS_Winserv_" + os.path.basename(INPUT_DIR)+".csv")
     AV_BASE_VER     = args.version
     RECORD_PREFIX   = args.number
+    if args.merge:
+        MERGE_FILE = os.path.join(OUTPUT_DIR,"MERGED_" + os.path.basename(INPUT_DIR)+".csv")
+    else:
+        MERGE_FILE = None
     
     init_input(INPUT_DIR) # read input files
+    
+    if MERGE_FILE:
+        try:
+            merged_file = open(MERGE_FILE,encoding='utf-8-sig',mode='w')
+            merged_file.write(",".join(list(MERGED_HEADER.values())) + '\n')
+        except :
+            print(f'Unable to open {MERGED_FILE}--', sys.exc_info()[0])
+            raise
+        MBSA = getMBSA({'adobe':        (R1,[MERGED_HEADER['E'],MERGED_HEADER['F'],MERGED_HEADER['G']]), \
+                        'flashplayer':  (R2,[MERGED_HEADER['H'],MERGED_HEADER['I'],MERGED_HEADER['J']]), \
+                        'java':         (R3,[MERGED_HEADER['K'],MERGED_HEADER['L'],MERGED_HEADER['M']])})
+        GCBSW = getGCBSW(R5)
+        GCBOS = getGCBOS(R6)
+        merged_data = getmerged_data(GCBOS,GCBSW,MBSA)
+        for ip,v in merged_data.items():
+            line = list(v.values())
+            line.insert(1, ip)
+            merged_file.write(",".join(line) + '\n')
+        merged_file.close()
     
     #開啟輸出檔案
     try:
