@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import openpyxl,sys,argparse,re,os,csv,glob
+import openpyxl,sys,argparse,re,os,csv
 from os.path import join
+ARG_FILE = "arg.txt"
 MERGED_HEADER = {'A':'Hostname',\
                  'B':'IP',\
                  'C':'OS version',\
@@ -30,16 +31,16 @@ TVMS_HEADERS = {"A":"弱點發現時間",\
                 "M":"弱點修補建議",\
                 "N":"弱點證據描述",\
                 "O":"類型(弱點或合規)"}
-VUL_NAME = {"D":"作業系統更新",\
-            "E":"第三方軟體",\
-            "F":"第三方軟體", \
-            "G":"第三方軟體", \
-            "H":"第三方軟體",\
-            "I":"防毒",\
-            "J":"防毒",\
-            "K":"防毒",\
-            "L":"第三方軟體",\
-            "M":"作業系統更新"}
+VUL_NAME = {"D":"作業系統安全性更新編號",\
+            "E":"Office應用程式安全性更編號",\
+            "F":"Adobe Reader未更新", \
+            "G":"Flash Player未更新", \
+            "H":"Java未更新",\
+            "I":"防毒軟體未更新",\
+            "J":"防毒軟體未安裝",\
+            "K":"防毒軟體病毒碼未更新",\
+            "L":"Office軟體版本過舊",\
+            "M":"Windows作業系統版本過舊"}
 UNUPDATED = "未更新"
 UPDATED = "已更新至最新"
 KBNOTFOUND = "kbid is not found"
@@ -48,7 +49,6 @@ FAILED = "不符合"
 PASSED = "符合"
 TOOL_NAME = "神網資產管理系統健診說明"
 CHECK_TYPE = "合規"
-GCB_AUDIT = 'GCB合規檢測'
 MBSA = {"ADOBE":"adobe_big5.csv",\
         "FLASHPLAYER":"flashplayer_big5.csv",\
         "JAVA":"java_big5.csv",\
@@ -67,8 +67,7 @@ def is_windows_phaseout(s):
 
 def getRecSeq(count):
     global RECORD_PREFIX
-#     return "{}{:0>10d}".format(RECORD_PREFIX,count)
-    return ""
+    return "{}{:0>10d}".format(RECORD_PREFIX,count)
 def csv2exel(csvfile):
     wb = openpyxl.Workbook()
     ws = wb.active
@@ -169,13 +168,12 @@ def init_input(input_dir):
     R5 = [os.path.normpath(join(subdirs[2],f)) for f in R5]
     
     #開啟作業系統版本報表
-#     R6 = os.listdir(subdirs[3])
-    R6 = glob.glob(subdirs[3]+"/*.xl*")
+    R6 = os.listdir(subdirs[3])
     try:
         if (len(R6) == 0):
             sys.exit(f"\"{subdirs[3]}\" 資料夾內沒有作業系統版本檔案")
-#         if not (len(R6) == 1):
-#             sys.exit(f"\"{subdirs[3]}\" 資料夾內應僅有1個作業系統版本檔案")
+        if not (len(R6) == 1):
+            sys.exit(f"\"{subdirs[3]}\" 資料夾內應僅有1個作業系統版本檔案")
     except SystemExit as e:
         print(str(e))
         exit    
@@ -197,49 +195,21 @@ def process_R0(R0):
                 if (UNUPDATED in cell.value) or (KBNOTFOUND in cell.value): #儲存格中有  【未更新】 或 【kbid is not found】
                     result_list = dict(zip(TVMS_HEADERS.keys(),['']*len(TVMS_HEADERS.keys())))
                     IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                    result_list['H'] = VUL_NAME[cell.column_letter]
-                    result_list['G'] = FAILED                    
+                    result_list['F'] = VUL_NAME[cell.column_letter]
+                    result_list['G'] = FAILED
+                    
                     m = re.search("(?<=:).+(?=;)", cell.value)
                     if m: # UNUPDATED
                         s = ";".join(["KB"+i.strip() for i in m.group(0).split(";")])
-                        result_list['N'] = "目前版本：未更新" + s
+                        result_list['K'] = "目前版本：未更新" + s
                         result_list['M'] = "更新至" + s + "或以上版本"
                     
                     m = re.search(KBNOTFOUND, cell.value)
                     if m: # KBNOTFOUND
-                        result_list['N'] = m.group(0)
+                        result_list['K'] = m.group(0)
                         result_list['M'] = "Windows update安全性更新至最新"
                     
-                    result_list['K'] = "作業系統安全性更新編號"
                     result_list['O'] = CHECK_TYPE
-                    result_list['F'] = GCB_AUDIT
-                    for ip in IP:
-                        result_list['J'] = getRecSeq(count+1)
-                        result_list['B'] = ip
-                        result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                        output.append(",".join(list(result_list.values())))
-                        count = count + 1
-                else:
-                    result_list = dict(zip(TVMS_HEADERS.keys(),['']*len(TVMS_HEADERS.keys())))
-                    IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                    result_list['H'] = VUL_NAME[cell.column_letter]
-                    result_list['G'] = PASSED
-                    result_list['N'] = "已更新至最新版本"
-                    result_list['M'] = "已更新至最新版本，無修補建議"
-#                     m = re.search("(?<=:).+(?=;)", cell.value)
-#                     if m: # UNUPDATED
-#                         s = ";".join(["KB"+i.strip() for i in m.group(0).split(";")])
-#                         result_list['N'] = "目前版本：未更新" + s
-#                         result_list['M'] = "更新至" + s + "或以上版本"
-#                     
-#                     m = re.search(KBNOTFOUND, cell.value)
-#                     if m: # KBNOTFOUND
-#                         result_list['N'] = m.group(0)
-#                         result_list['M'] = "Windows update安全性更新至最新"
-                    
-                    result_list['K'] = "作業系統安全性更新編號"
-                    result_list['O'] = CHECK_TYPE
-                    result_list['F'] = GCB_AUDIT
                     for ip in IP:
                         result_list['J'] = getRecSeq(count+1)
                         result_list['B'] = ip
@@ -260,29 +230,11 @@ def process_R1(R1):
             if UNUPDATED in cell.value:
                 result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
                 IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['F']
+                result_list['F'] = VUL_NAME['F']
                 result_list['G'] = FAILED
-                result_list['N'] = "目前版本：Adobe Reader " + ws[f'E{cell.row}'].value
+                result_list['K'] = "目前版本：Adobe Reader " + ws[f'E{cell.row}'].value
                 result_list['M'] = "更新至{}或以上版本".format(ws[f'D{cell.row}'].value)
-                result_list['K'] = "Adobe Reader未更新"
                 result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
-            else:
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['F']
-                result_list['G'] = PASSED
-                result_list['N'] = "已更新至最新版本"
-                result_list['M'] = "已更新至最新版本，無修補建議"
-                result_list['K'] = "Adobe Reader未更新"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
                 for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
                     result_list['B'] = ip
@@ -301,29 +253,11 @@ def process_R2(R2):
             if UNUPDATED in cell.value:
                 result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
                 IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['G']
+                result_list['F'] = VUL_NAME['G']
                 result_list['G'] = FAILED
-                result_list['N'] = "目前版本：Flash Player " + ws[f'E{cell.row}'].value
+                result_list['K'] = "目前版本：Flash Player " + ws[f'E{cell.row}'].value
                 result_list['M'] = "建議移除軟體"
-                result_list['K'] = "Flash Player未更新"
                 result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
-            else:
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['G']
-                result_list['G'] = PASSED
-                result_list['N'] = "已更新至最新版本"
-                result_list['M'] = "已更新至最新版本，無修補建議"
-                result_list['K'] = "Flash Player未更新"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
                 for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
                     result_list['B'] = ip
@@ -342,29 +276,11 @@ def process_R3(R3):
             if UNUPDATED in cell.value:
                 result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
                 IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['H']
+                result_list['F'] = VUL_NAME['H']
                 result_list['G'] = FAILED
-                result_list['N'] = "目前版本：Java " + ws[f'E{cell.row}'].value
+                result_list['K'] = "目前版本：Java " + ws[f'E{cell.row}'].value
                 result_list['M'] = "更新至{}或以上版本".format(ws[f'D{cell.row}'].value)
-                result_list['K'] = "Java未更新"
                 result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
-            else:
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['H']
-                result_list['G'] = PASSED
-                result_list['N'] = "已更新至最新版本"
-                result_list['M'] = "已更新至最新版本，無修補建議"
-                result_list['K'] = "Java未更新"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
                 for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
                     result_list['B'] = ip
@@ -383,29 +299,11 @@ def process_R4(R4):
             if UNUPDATED in cell.value:
                 result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
                 IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['K']
+                result_list['F'] = VUL_NAME['K']
                 result_list['G'] = FAILED
-                result_list['N'] = "目前版本： " + ws[f'E{cell.row}'].value
+                result_list['K'] = "目前版本： " + ws[f'E{cell.row}'].value
                 result_list['M'] = "更新至{}或以上版本".format(ws[f'D{cell.row}'].value)
-                result_list['K'] = "防毒軟體病毒碼更新"
                 result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
-            else:
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['K']
-                result_list['G'] = PASSED
-                result_list['N'] = "已更新至最新版本"
-                result_list['M'] = "已更新至最新版本，無修補建議"
-                result_list['K'] = "防毒軟體病毒碼更新"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
                 for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
                     result_list['B'] = ip
@@ -420,29 +318,11 @@ def process_R4(R4):
             if cell.value == "":
                 result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
                 IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['J']
+                result_list['F'] = VUL_NAME['J']
                 result_list['G'] = FAILED
-                result_list['N'] = "目前版本：未發現防毒軟體"
+                result_list['K'] = "目前版本：未發現防毒軟體"
                 result_list['M'] = f'安裝本府趨勢防毒軟體{AV_BASE_VER}版本'
-                result_list['K'] = "防毒軟體未安裝"
                 result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
-            else:
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                IP = ws[f'C{cell.row}'].value.strip(";").split(";")
-                result_list['H'] = VUL_NAME['J']
-                result_list['G'] = PASSED
-                result_list['N'] = "已更新至最新版本"
-                result_list['M'] = "已更新至最新版本，無修補建議"
-                result_list['K'] = "防毒軟體未安裝"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
                 for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
                     result_list['B'] = ip
@@ -467,15 +347,12 @@ def process_R5(R5):
             print(f'無法開啟軟體版本更新報表檔案 --', sys.exc_info()[0])
             exit
         ws = r.active
-#         av_ver = [] # antivirus software versions
         av_ver = {}
         office_ver = [] #Office versions
         for cell in ws['B']: #check "防毒軟體未更新" & "Office軟體版本過舊"
             if cell.row == 1:
                 continue  # skip the first row
             else:
-#                 if ("Trend Micro Apex One Security Agent" in cell.value) or ("OfficeScan" in cell.value):
-#                     av_ver.append(ws[f'C{cell.row}'].value)
                 if ("Trend Micro Apex One Security Agent" in cell.value):
                     av_ver.update({'Apex':ws[f'C{cell.row}'].value})
                 if ("OfficeScan" in cell.value):
@@ -484,65 +361,36 @@ def process_R5(R5):
                     office_ver.append(cell.value)
                     
         if len(av_ver) > 0:
-#             if AV_BASE_VER > sorted(av_ver)[-1]: # av version smaller than required
+            result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
+            result_list['F'] = VUL_NAME['I']
+            result_list['O'] = CHECK_TYPE
             if AV_BASE_VER > sorted(av_ver.items())[0][-1]: # get Apex'ver insted of Officescan's ver and compare version smaller than required
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                result_list['H'] = VUL_NAME['I']
                 result_list['G'] = FAILED
-#                 result_list['N'] = "目前版本： " + sorted(av_ver)[-1]
-                result_list['N'] = "目前版本： " + sorted(av_ver.items())[0][-1]
+                result_list['K'] = "目前版本： " + sorted(av_ver)[-1]
                 result_list['M'] = f'安裝本府趨勢防毒軟體{AV_BASE_VER}版本'
-                result_list['K'] = "防毒軟體未更新"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
             else:
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                result_list['H'] = VUL_NAME['I']
                 result_list['G'] = PASSED
-                result_list['N'] = "已更新至最新版本"
+                result_list['K'] = "已更新至最新版本"
                 result_list['M'] = "已更新至最新版本，無修補建議"
-                result_list['K'] = "防毒軟體未更新"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
+            for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
                     result_list['B'] = ip
                     result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                     output.append(",".join(list(result_list.values())))
                     count = count + 1
-        
         for v in office_ver:
+            result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
+            result_list['F'] = VUL_NAME['L']
+            result_list['O'] = CHECK_TYPE
             if is_office_phaseout(v):
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                result_list['H'] = VUL_NAME['L']
                 result_list['G'] = FAILED
-                result_list['N'] = "目前版本： " + v
+                result_list['K'] = "目前版本： " + v
                 result_list['M'] = "更新至Microsoft Office 2013或以上"
-                result_list['K'] = "Office應用程式安全性更編號"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
             else:
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                result_list['H'] = VUL_NAME['L']
                 result_list['G'] = PASSED
-                result_list['N'] = "已更新至最新版本"
+                result_list['K'] = "已更新至最新版本"
                 result_list['M'] = "已更新至最新版本，無修補建議"
-                result_list['K'] = "Office應用程式安全性更編號"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
+        for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
                     result_list['B'] = ip
                     result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
@@ -560,29 +408,11 @@ def process_R6(R6):
             if is_windows_phaseout(cell.value):
                 result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
                 IP = ws[f'A{cell.row}'].value.split(",")
-                result_list['H'] = VUL_NAME['M']
+                result_list['F'] = VUL_NAME['M']
                 result_list['G'] = FAILED
-                result_list['N'] = "目前版本： " + ws[f'E{cell.row}'].value
+                result_list['K'] = "目前版本： " + ws[f'E{cell.row}'].value
                 result_list['M'] = "更新至Microsoft Windows Server 2012或以上"
-                result_list['K'] = "作業系統安全性更新編號"
                 result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
-                for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
-            else:
-                result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                IP = ws[f'A{cell.row}'].value.split(",")
-                result_list['H'] = VUL_NAME['M']
-                result_list['G'] = PASSED
-                result_list['N'] = "已更新至最新版本"
-                result_list['M'] = "已更新至最新版本，無修補建議"
-                result_list['K'] = "作業系統安全性更新編號"
-                result_list['O'] = CHECK_TYPE
-                result_list['F'] = GCB_AUDIT
                 for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
                     result_list['B'] = ip
@@ -672,7 +502,8 @@ def main():
     parser.add_argument("-n", "--number",help = "評估工具原廠之弱點編號",default="")
     parser.add_argument("-a", "--version",help = "防毒軟體基準版本",default='14.0.9204')
     parser.add_argument("-m", "--merge",help = "產生彙整檔案",action="store_true",default=False)
-    
+
+    args = parser.parse_args()
     args = parser.parse_args()
     INPUT_DIR = os.path.abspath(args.read)
     OUTPUT_DIR      = args.output
@@ -680,15 +511,15 @@ def main():
     AV_BASE_VER     = args.version
     RECORD_PREFIX   = args.number
     if args.merge:
-        MERGE_FILE = os.path.join(OUTPUT_DIR,"MERGED_" + os.path.basename(INPUT_DIR)+".csv")
+        MERGED_FILE = os.path.join(OUTPUT_DIR,"MERGED_" + os.path.basename(INPUT_DIR)+".csv")
     else:
-        MERGE_FILE = None
+        MERGED_FILE = None
     
     init_input(INPUT_DIR) # read input files
-    
-    if MERGE_FILE:
+    #開啟輸出彙整檔案
+    if MERGED_FILE:
         try:
-            merged_file = open(MERGE_FILE,encoding='utf-8-sig',mode='w')
+            merged_file = open(MERGED_FILE,encoding='utf-8-sig',mode='w')
             merged_file.write(",".join(list(MERGED_HEADER.values())) + '\n')
         except :
             print(f'Unable to open {MERGED_FILE}--', sys.exc_info()[0])
@@ -730,8 +561,6 @@ def main():
     output.extend(process_R6(R6))
     output_file.write("\n".join(output))
     output_file.close()
-    
-    
     
 if __name__ == '__main__':
     try:
