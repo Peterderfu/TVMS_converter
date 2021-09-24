@@ -290,18 +290,22 @@ def process_R3(R3):
 def process_R4(R4):
     global count
     output = []
+    cols = ['uuid','hostname','ip','latest','avname','current','status']
+    colMap = dict(zip(cols,[None]*len(cols)))
     ws = R4.active
-    for cell in ws['F']: #check "防毒軟體病毒碼未更新"
+    for i in ws['1']:
+        colMap[i.value]=i.column_letter
+    for cell in ws[f'{colMap["status"]}']: #check "防毒軟體病毒碼未更新"
         if cell.row == 1:
             continue  # skip the first row
         else:
             if UNUPDATED in cell.value:
                 result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
-                IP = ws[f'C{cell.row}'].value.strip(";").split(";")
+                IP = ws[f'{colMap["ip"]}{cell.row}'].value.strip(";").split(";")
                 result_list['F'] = VUL_NAME['K']
                 result_list['G'] = FAILED
-                result_list['K'] = "目前版本： " + ws[f'E{cell.row}'].value
-                result_list['M'] = "更新至{}或以上版本".format(ws[f'D{cell.row}'].value)
+                result_list['K'] = "目前版本： " + ws[f'{colMap["current"]}{cell.row}'].value
+                result_list['M'] = "更新至{}或以上版本".format(ws[f'{colMap["latest"]}{cell.row}'].value)
                 result_list['O'] = CHECK_TYPE
                 for ip in IP:
                     result_list['J'] = getRecSeq(count+1)
@@ -310,9 +314,15 @@ def process_R4(R4):
                     output.append(",".join(list(result_list.values())))
                     count = count + 1
     return output
-def process_R5(R5):
+def process_R5(R4,R5):
     global count
     output = []
+    cols = ['uuid','hostname','ip','latest','avname','current','status']
+    colMap = dict(zip(cols,[None]*len(cols)))
+    antivirus = R4.active
+    for i in antivirus['1']:
+        colMap[i.value]=i.column_letter
+    IP_STATUS = dict(zip([c.value for c in antivirus[f'{colMap["ip"]}']],[c.value for c in antivirus[f'{colMap["status"]}']]))
     for f in R5:
         m = re.search('(?<=_)\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}.*(?=_)', f)
         if m:  # filename pattern "_[IPv4]_" found 
@@ -364,12 +374,19 @@ def process_R5(R5):
                 result_list['G'] = PASSED
                 result_list['K'] = "已更新至最新版本"
                 result_list['M'] = "已更新至最新版本，無修補建議"
+                
+        for i in list(IP_STATUS.keys()):
+            if result_list['K'] == "目前版本：未發現防毒軟體":
+                if (ip in i) and ((UPDATED in IP_STATUS[i]) or (UNUPDATED in IP_STATUS[i])):
+                    result_list = None
+                    break
+        if result_list:
             for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
+                result_list['J'] = getRecSeq(count+1)
+                result_list['B'] = ip
+                result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
+                output.append(",".join(list(result_list.values())))
+                count = count + 1
         for v in office_ver:
             result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
             result_list['F'] = VUL_NAME['L']
@@ -382,12 +399,13 @@ def process_R5(R5):
                 result_list['G'] = PASSED
                 result_list['K'] = "已更新至最新版本"
                 result_list['M'] = "已更新至最新版本，無修補建議"
-        for ip in IP:
-                    result_list['J'] = getRecSeq(count+1)
-                    result_list['B'] = ip
-                    result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
-                    output.append(",".join(list(result_list.values())))
-                    count = count + 1
+        if result_list:
+            for ip in IP:
+                result_list['J'] = getRecSeq(count+1)
+                result_list['B'] = ip
+                result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
+                output.append(",".join(list(result_list.values())))
+                count = count + 1
     return output
 def process_R6(R6):
     global count
@@ -542,6 +560,7 @@ def main():
     except :
         print(f'Unable to open {OUTPUT_FILE}--', sys.exc_info()[0])
         raise
+    print(f'Output to : {OUTPUT_FILE}')
     output_file.write(",".join(list(TVMS_HEADERS.values()))+"\n")
     
     output = []
@@ -556,7 +575,7 @@ def main():
     #挑出【防毒軟體病毒碼未更新】& 【防毒軟體未安裝】列
     output.extend(process_R4(R4))
     # 挑出【防毒軟體未更新】& 【Office軟體版本過舊】列
-    output.extend(process_R5(R5))
+    output.extend(process_R5(R4,R5))
     # 挑出【Windows作業系統版本過舊】列
     output.extend(process_R6(R6))
     output_file.write("\n".join(output))
