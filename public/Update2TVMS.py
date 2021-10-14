@@ -89,11 +89,11 @@ def init_input(input_dir):
             subdirs[1].startswith("02_") and \
             subdirs[2].startswith("03_") and \
             subdirs[3].startswith("04_")):
-        sys.exit(f"{input_dir} 內資料夾名稱不符-請用 以下名稱\n\
-                    01_伺服器更新報表\n\
-                    02_軟體版本更新報表\n\
-                    03_作業系統版本報表\n\
-                    04_MBSA版本報表")
+        sys.exit(f"{input_dir} 內資料夾名稱不符-請用 以下名稱\n \
+                    01_伺服器更新報表\n \
+                    02_MBSA版本報表\n \
+                    03_軟體版本更新報表\n \
+                    04_作業系統版本報表")
     subdirs = [os.path.normpath(join(input_dir,d)) for d in subdirs]
     
     #開啟伺服器更新報表
@@ -216,6 +216,7 @@ def process_R0(R0):
                         result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                         output.append(",".join(list(result_list.values())))
                         count = count + 1
+                    result_list = None
     return output
 
 def process_R1(R1):
@@ -240,6 +241,7 @@ def process_R1(R1):
                     result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                     output.append(",".join(list(result_list.values())))
                     count = count + 1
+                result_list = None
     return output
 def process_R2(R2):
     global count
@@ -263,6 +265,7 @@ def process_R2(R2):
                     result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                     output.append(",".join(list(result_list.values())))
                     count = count + 1
+                result_list = None
     return output
 def process_R3(R3):
     global count
@@ -286,6 +289,7 @@ def process_R3(R3):
                     result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                     output.append(",".join(list(result_list.values())))
                     count = count + 1
+                result_list = None
     return output
 def process_R4(R4):
     global count
@@ -313,6 +317,7 @@ def process_R4(R4):
                     result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                     output.append(",".join(list(result_list.values())))
                     count = count + 1
+                result_list = None
     return output
 def process_R5(R4,R5):
     global count
@@ -324,7 +329,7 @@ def process_R5(R4,R5):
         colMap[i.value]=i.column_letter
     IP_STATUS = dict(zip([c.value for c in antivirus[f'{colMap["ip"]}']],[c.value for c in antivirus[f'{colMap["status"]}']]))
     for f in R5:
-        m = re.search('(?<=_)\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}.*(?=_)', f)
+        m = re.search('(?<=_)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}.*(?=_)', f)
         if m:  # filename pattern "_[IPv4]_" found 
             IP = m.group(0).split(',')
         else:
@@ -343,11 +348,11 @@ def process_R5(R4,R5):
             if cell.row == 1:
                 continue  # skip the first row
             else:
-                if ("Trend Micro Apex One Security Agent" in cell.value):
+                if ("Trend Micro Apex One Security Agent".lower() in cell.value.lower()):
                     av_ver.update({KEY_APEX:ws[f'C{cell.row}'].value})
-                if ("OfficeScan" in cell.value):
+                if ("OfficeScan" in cell.value.lower()):
                     av_ver.update({KEY_OFFICESCAN:ws[f'C{cell.row}'].value})
-                if ("office" in cell.value) and not ("OfficeScan" in cell.value):
+                if ("office" in cell.value.lower()) and not ("OfficeScan" in cell.value.lower()):
                     office_ver.append(cell.value)
                     
         if len(av_ver) == 0: # check "防毒軟體未安裝"
@@ -368,7 +373,7 @@ def process_R5(R4,R5):
              
             if AV_BASE_VER > curver: # get Apex'ver insted of Officescan's ver and compare version smaller than required
                 result_list['G'] = FAILED
-                result_list['K'] = "目前版本： " + sorted(av_ver)[-1]
+                result_list['K'] = "目前版本： " + curver
                 result_list['M'] = f'安裝本府趨勢防毒軟體{AV_BASE_VER}版本'
             else:
                 result_list['G'] = PASSED
@@ -377,7 +382,7 @@ def process_R5(R4,R5):
                 
         for i in list(IP_STATUS.keys()):
             if result_list['K'] == "目前版本：未發現防毒軟體":
-                if (ip in i) and ((UPDATED in IP_STATUS[i]) or (UNUPDATED in IP_STATUS[i])):
+                if ((UPDATED in IP_STATUS[i]) or (UNUPDATED in IP_STATUS[i])):
                     result_list = None
                     break
         if result_list:
@@ -387,6 +392,7 @@ def process_R5(R4,R5):
                 result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                 output.append(",".join(list(result_list.values())))
                 count = count + 1
+            result_list = None
         for v in office_ver:
             result_list = dict(zip(TVMS_HEADERS.keys(), [''] * len(TVMS_HEADERS.keys())))
             result_list['F'] = VUL_NAME['L']
@@ -406,6 +412,7 @@ def process_R5(R4,R5):
                 result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                 output.append(",".join(list(result_list.values())))
                 count = count + 1
+            result_list = None
     return output
 def process_R6(R6):
     global count
@@ -429,6 +436,7 @@ def process_R6(R6):
                     result_list = dict(sorted(result_list.items(), key=lambda item: item[0]))
                     output.append(",".join(list(result_list.values())))
                     count = count + 1
+                result_list = None
     return output
 def getMBSA(file_mbsa):
     MBSA = {}
